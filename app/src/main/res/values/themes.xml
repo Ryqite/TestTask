@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Innowise" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">
+            @color/red
+        </item>
+        <item name="windowSplashScreenAnimatedIcon">
+            @drawable/splash_logo
+        </item>
+    </style>
+</resources>
