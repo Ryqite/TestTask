@@ -103,6 +103,7 @@ class MainActivity : ComponentActivity() {
                             selected = selected,
                             onSelect = {selectedTab->
                                 networkViewModel.onSelectedChanged(selectedTab)
+                                networkViewModel.onSearchQueryChanged(selectedTab)
                             },
                             state = stateLoading,
                             tryAgain = {},

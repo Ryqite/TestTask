@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -33,15 +34,15 @@ class NetworkViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("Ocean")
     val searchQuery: StateFlow<String> = _searchQuery
 
-    private val _collectionRow = MutableStateFlow(mapOf(_searchQuery.value to 1))
+    private val _collectionRow = MutableStateFlow<Map<String, Int>>(emptyMap())
     private val _topKeys = MutableStateFlow(_collectionRow.value
         .toList()
         .sortedByDescending { it.second }
         .take(7)
         .map { it.first })
     val topKeys: StateFlow<List<String>> = _topKeys.asStateFlow()
-    private val _selected = MutableStateFlow(_searchQuery.value)
-    val selected: StateFlow<String> = _selected
+    private val _selected = MutableStateFlow<String?>(null)
+    val selected: StateFlow<String?> = _selected
     private val _stateLoading = MutableStateFlow(false)
     val stateLoading: StateFlow<Boolean> = _stateLoading
     private var searchJob: Job? = null
@@ -74,6 +75,19 @@ class NetworkViewModel @Inject constructor(
 
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
+        if (query.isNotBlank()) {
+            _topKeys.update { currentList ->
+                val newList = currentList
+                    .filter { it != query }
+                    .toMutableList()
+
+                newList.add(0, query)
+                newList
+            }
+            _selected.value =
+                if (_topKeys.value.contains(query)) query
+                else null
+        }
     }
 
     fun onSelectedChanged(item: String) {
