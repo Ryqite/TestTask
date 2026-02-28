@@ -10,6 +10,8 @@ data class PhotosDbModel(
     val id: Int = 0,
     @ColumnInfo(name = "title")
     val title: String = "",
+    @ColumnInfo(name = "author")
+    val author: String = "",
     @ColumnInfo(name = "imageLink")
     val image: String = "",
     @ColumnInfo(name = "detailedImageLink")

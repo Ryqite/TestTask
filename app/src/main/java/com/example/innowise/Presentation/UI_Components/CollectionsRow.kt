@@ -22,7 +22,7 @@ fun CollectionsRow(collections: List<String>,
                    onSelect: (String) -> Unit) {
 
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.Start
     ) {
 
         items(collections) { item ->

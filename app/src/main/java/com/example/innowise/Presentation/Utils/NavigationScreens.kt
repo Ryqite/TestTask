@@ -1,16 +1,13 @@
-package com.example.innowise.Presentation.Utils
+package com.example.week12.Presentation.Utils
 
+import com.example.innowise.Presentation.Models.PhotosItem
 import kotlinx.serialization.Serializable
 
 sealed class NavigationScreens {
     @Serializable
-    object MainScreen
+    object HomeScreen
     @Serializable
-    object ProfileScreen
+    object BookmarksScreen
     @Serializable
-    object SavedScreen
-    @Serializable
-    data class DetailScreen(val id:String)
-    @Serializable
-    data class DetailSavedScreen(val id:String)
+    data class DetailsScreen(val photoId: String)
 }

@@ -1,6 +1,7 @@
 package com.example.innowise.Presentation.UI_Components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,9 +28,11 @@ import com.example.innowise.Presentation.Models.PhotosItem
 import com.example.innowise.R
 
 @Composable
-fun PhotosBookmarksGrid(photos: List<PhotosItem>,
-               modifier: Modifier = Modifier) {
-
+fun PhotosBookmarksGrid(
+    photos: List<PhotosItem>,
+    modifier: Modifier = Modifier,
+    onClick: (String)->Unit
+) {
     LazyVerticalGrid(
         modifier = modifier,
         columns = GridCells.Fixed(2),
@@ -47,17 +50,22 @@ fun PhotosBookmarksGrid(photos: List<PhotosItem>,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
-                        .clip(RoundedCornerShape(16.dp)),
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable{onClick(photo.title)},
                     contentScale = ContentScale.Crop
                 )
                 Text(
-                    text = photo.title,
+                    text = photo.author,
                     textAlign = TextAlign.Center,
                     color = Color.White,
-                    modifier = Modifier.fillMaxWidth()
-                        .clip(RoundedCornerShape(
-                            bottomStart = 16.dp,
-                            bottomEnd = 16.dp))
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(
+                            RoundedCornerShape(
+                                bottomStart = 16.dp,
+                                bottomEnd = 16.dp
+                            )
+                        )
                         .background(Color(0xFF0000000).copy(alpha = 0.4f))
                         .align(Alignment.BottomStart)
                         .padding(8.dp)

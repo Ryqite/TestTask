@@ -1,6 +1,8 @@
 package com.example.innowise.Presentation.UI_Components
 
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,8 +24,11 @@ import com.example.innowise.Presentation.Models.PhotosItem
 import com.example.innowise.R
 
 @Composable
-fun PhotosGrid(photos: List<PhotosItem>,
-               modifier: Modifier = Modifier) {
+fun PhotosGrid(
+    photos: List<PhotosItem>,
+    modifier: Modifier = Modifier,
+    onClick: (String)->Unit
+) {
 
     LazyVerticalGrid(
         modifier = modifier,
@@ -33,6 +38,7 @@ fun PhotosGrid(photos: List<PhotosItem>,
     ) {
 
         items(photos) { photo ->
+            Log.d("PHOTO_URL", photo.image)
             AsyncImage(
                 model = photo.image,
                 placeholder = painterResource(R.drawable.appicon),
@@ -41,7 +47,8 @@ fun PhotosGrid(photos: List<PhotosItem>,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
-                    .clip(RoundedCornerShape(16.dp)),
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable{onClick(photo.title)},
                 contentScale = ContentScale.Crop
             )
 

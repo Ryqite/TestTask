@@ -13,6 +13,8 @@ interface PhotosAPI {
     suspend fun getPhotosBySearch(
         @Query("query")
         keywords: String = "Ocean",
+        @Query("per_page")
+        per_page: Int = 30,
         @Query("page")
         page: Int = 1
     ): PhotosDTO

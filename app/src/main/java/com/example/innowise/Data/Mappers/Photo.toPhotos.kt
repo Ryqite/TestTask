@@ -6,8 +6,9 @@ import com.example.innowise.Domain.Models.Photos
 
 fun Photo.toPhotos(): Photos = Photos(
     id = 0,
+    author = photographer,
     title = alt?:"",
-    image = url?:"",
+    image = src.original?:"",
     detailed = src.landscape?:"",
     isSaved = false
 )

@@ -6,6 +6,7 @@ import com.example.innowise.Domain.Models.Photos
 
 fun PhotosDbModel.toPhotos(): Photos = Photos(
     id = id,
+    author = author,
     title = title,
     detailed = detailed,
     image = image,

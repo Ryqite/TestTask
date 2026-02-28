@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.minus
+import kotlin.collections.plus
 
 @HiltViewModel
 class DatabaseViewModel @Inject constructor(
@@ -24,9 +26,9 @@ class DatabaseViewModel @Inject constructor(
 ) : ViewModel() {
     private val _photosFromDb = MutableStateFlow<List<PhotosItem>>(emptyList())
     val photosFromDb: StateFlow<List<PhotosItem>> = _photosFromDb
+
     private val _savedPhotosIds = MutableStateFlow<Set<String>>(emptySet())
     val savedPhotosIds: StateFlow<Set<String>> = _savedPhotosIds
-
 
     init {
         getAllPhotosFromDb()
