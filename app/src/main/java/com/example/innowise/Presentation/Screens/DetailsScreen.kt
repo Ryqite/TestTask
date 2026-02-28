@@ -50,6 +50,7 @@ import com.example.innowise.R
 import coil.compose.AsyncImage
 import com.example.innowise.Presentation.Models.PhotosItem
 import com.example.innowise.Presentation.UI_Components.EmptyDetails
+import com.example.innowise.Presentation.Utils.downloadImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +59,6 @@ fun DetailsScreen(
     photos: List<PhotosItem>,
     onBack: () -> Unit,
     state: Boolean,
-    onDownload: () -> Unit,
     onBookmark: (PhotosItem) -> Unit,
     onExplore: () -> Unit
 ) {
@@ -158,7 +158,9 @@ fun DetailsScreen(
                 ) {
 
                     Button(
-                        onClick = onDownload,
+                        onClick = {photo?.image?.let {
+                            downloadImage(context, it)
+                        }},
                         modifier = Modifier.width(180.dp),
                         shape = RoundedCornerShape(24.dp),
                         colors = ButtonDefaults.buttonColors(

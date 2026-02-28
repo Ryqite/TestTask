@@ -29,6 +29,7 @@ import com.example.innowise.Presentation.Models.PhotosItem
 import com.example.innowise.Presentation.Screens.Bookmarks
 import com.example.innowise.Presentation.Screens.DetailsScreen
 import com.example.innowise.Presentation.Screens.HomeScreen
+import com.example.innowise.Presentation.Utils.downloadImage
 import com.example.innowise.Presentation.ViewModels.DatabaseViewModel
 import com.example.innowise.Presentation.ViewModels.NetworkViewModel
 import com.example.innowise.Presentation.theme.InnowiseTheme
@@ -133,7 +134,6 @@ class MainActivity : ComponentActivity() {
                             photo = certainPhoto,
                             state = stateLoading,
                             onBack = {navController.popBackStack()},
-                            onDownload = {},
                             onBookmark = {photo->
                                 val updated = photo.copy(
                                     isSaved = !photo.isSaved
