@@ -40,7 +40,6 @@ class NetworkViewModel @Inject constructor(
         .take(7)
         .map { it.first })
     val topKeys: StateFlow<List<String>> = _topKeys.asStateFlow()
-
     private val _selected = MutableStateFlow(_searchQuery.value)
     val selected: StateFlow<String> = _selected
     private val _stateLoading = MutableStateFlow(false)

@@ -43,12 +43,17 @@ android {
 }
 
 dependencies {
+    implementation("com.google.accompanist:accompanist-placeholder-material:0.36.0")
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.foundation:foundation:1.10.4")
+    implementation("androidx.compose.material3:material3:1.4.0")
     implementation("androidx.compose.material:material-icons-core")
     implementation("androidx.compose.material:material-icons-extended")
     //Splash API
     implementation("androidx.core:core-splashscreen:1.0.1")
     //Hilt
     implementation("com.google.dagger:hilt-android:2.56.2")
+    implementation(libs.androidx.compose.ui.geometry)
     ksp("com.google.dagger:hilt-android-compiler:2.56.2")
     ksp("com.google.devtools.ksp:symbol-processing-api:2.1.10-1.0.31")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")

@@ -79,7 +79,8 @@ fun Bookmarks(
                             PhotosBookmarksGrid(
                                 photos,
                                 modifier = Modifier.weight(1f),
-                                onClick = onClick
+                                onClick = onClick,
+                                state = state
                             )
                     }
                 }

@@ -25,6 +25,7 @@ import com.example.innowise.Domain.UseCases.GetPhotosBySearchUseCase
 import com.example.innowise.Domain.UseCases.InsertNewPhotoUseCase
 import com.example.innowise.Domain.UseCases.UpdatePhotoUseCase
 import com.example.innowise.Presentation.Models.BottomTab
+import com.example.innowise.Presentation.Models.PhotosItem
 import com.example.innowise.Presentation.Screens.Bookmarks
 import com.example.innowise.Presentation.Screens.DetailsScreen
 import com.example.innowise.Presentation.Screens.HomeScreen
@@ -34,6 +35,7 @@ import com.example.innowise.Presentation.theme.InnowiseTheme
 import com.example.innowise.R
 import com.example.week12.Presentation.Utils.NavigationScreens
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import kotlin.getValue
 
@@ -81,6 +83,7 @@ class MainActivity : ComponentActivity() {
                 val savedPhotos by databaseViewModel.photosFromDb.collectAsState()
                 val savedPhotosIds by databaseViewModel.savedPhotosIds.collectAsState()
                 val stateLoading by networkViewModel.stateLoading.collectAsState()
+                val stateLoadingDatabase by databaseViewModel.stateLoadingDatabase.collectAsState()
                 val navController = rememberNavController()
                 var currentTab by remember { mutableStateOf(BottomTab.HOME) }
                 NavHost(
@@ -104,7 +107,7 @@ class MainActivity : ComponentActivity() {
                             state = stateLoading,
                             tryAgain = {},
                             onClick = {photoId->
-                                navController.navigate(NavigationScreens.DetailsScreen(photoId = photoId))},
+                                navController.navigate(NavigationScreens.DetailsScreen(photoId = photoId, from = "home"))},
                             currentTab = currentTab,
                             onTabSelected = {tab->
                                 currentTab = tab
@@ -119,9 +122,15 @@ class MainActivity : ComponentActivity() {
                     }
                     composable<NavigationScreens.DetailsScreen> {navBackStackEntry ->
                         val photo: NavigationScreens.DetailsScreen = navBackStackEntry.toRoute()
-                        val certainPhoto = photos.find { it.title == photo.photoId }
+                        val certainPhoto =
+                            if (photo.from == "bookmarks") {
+                                savedPhotos.find { it.title == photo.photoId }
+                            } else {
+                                photos.find { it.title == photo.photoId }
+                            }
                         DetailsScreen(
                             photo = certainPhoto,
+                            state = stateLoading,
                             onBack = {navController.popBackStack()},
                             onDownload = {},
                             onBookmark = {photo->
@@ -133,16 +142,17 @@ class MainActivity : ComponentActivity() {
 
                             },
                             onExplore = {navController.navigate(
-                                NavigationScreens.HomeScreen)})
+                                NavigationScreens.HomeScreen)},
+                            photos = savedPhotos)
                     }
                     composable<NavigationScreens.BookmarksScreen> {
                         Bookmarks(
                             photos = savedPhotos,
-                            state = stateLoading,
+                            state = stateLoadingDatabase,
                             onExplore = {navController.navigate(
                                 NavigationScreens.HomeScreen)},
                             onClick = {photoId->
-                                navController.navigate(NavigationScreens.DetailsScreen(photoId = photoId))},
+                                navController.navigate(NavigationScreens.DetailsScreen(photoId = photoId, from = "bookmarks"))},
                             currentTab = currentTab,
                             onTabSelected = {tab->
                                 currentTab = tab

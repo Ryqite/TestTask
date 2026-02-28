@@ -1,6 +1,10 @@
 package com.example.innowise.Presentation.Screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,14 +27,22 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,11 +55,19 @@ import com.example.innowise.Presentation.UI_Components.EmptyDetails
 @Composable
 fun DetailsScreen(
     photo: PhotosItem?,
+    photos: List<PhotosItem>,
     onBack: () -> Unit,
+    state: Boolean,
     onDownload: () -> Unit,
     onBookmark: (PhotosItem) -> Unit,
     onExplore: () -> Unit
 ) {
+    val context = LocalContext.current
+    var scale by remember { mutableStateOf(1f) }
+    val transformState = rememberTransformableState { zoomChange, _, _ ->
+        scale *= zoomChange
+        scale = scale.coerceIn(1f, 4f)
+    }
     when {
         photo?.image == "" -> EmptyDetails(onExplore = onExplore, onBack = onBack)
         else ->
@@ -86,7 +106,14 @@ fun DetailsScreen(
                         containerColor = Color.Transparent
                     )
                 )
-
+                if (state) {
+                    LinearProgressIndicator(
+                        color = Color(0xFFBB1020),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(20.dp))
 
                 AsyncImage(
@@ -95,8 +122,31 @@ fun DetailsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .clip(RoundedCornerShape(20.dp)),
-                    contentScale = ContentScale.Crop
+                        .clip(RoundedCornerShape(20.dp))
+                        .graphicsLayer {
+                            scaleX = scale
+                            scaleY = scale
+                        }
+                        .transformable(transformState)
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+
+                                    if (event.changes.all { !it.pressed }) {
+                                        scale = 1f
+                                    }
+                                }
+                            }
+                        },
+                    contentScale = ContentScale.Crop,
+                    onError = {
+                        Toast.makeText(
+                            context,
+                            "Failed to load image",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -150,19 +200,19 @@ fun DetailsScreen(
 
                     IconButton(
                         onClick = {
-                            if (photo != null && !photo.isSaved) {
+                            if (photo != null && photos.all{it.title != photo.title}) {
                                 onBookmark(photo)
                             }
                         },
                         modifier = Modifier
                             .size(48.dp)
-                            .background(if (photo?.isSaved == true) Color(0xFFF3F5F9) else Color(0xFFBB1020),
+                            .background(if (photos.all{it.title != photo?.title}) Color(0xFFBB1020) else Color(0xFFF3F5F9),
                                 CircleShape)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.icon_saving),
                             contentDescription = "Bookmark",
-                            tint = if (photo?.isSaved == true) Color.Black else Color.White
+                            tint = if (photos.all{it.title != photo?.title}) Color.White else Color.Black
                         )
                     }
                 }

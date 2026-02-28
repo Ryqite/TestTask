@@ -31,7 +31,8 @@ import com.example.innowise.R
 fun PhotosBookmarksGrid(
     photos: List<PhotosItem>,
     modifier: Modifier = Modifier,
-    onClick: (String)->Unit
+    onClick: (String)->Unit,
+    state: Boolean
 ) {
     LazyVerticalGrid(
         modifier = modifier,
@@ -52,7 +53,7 @@ fun PhotosBookmarksGrid(
                         .height(150.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .clickable{onClick(photo.title)},
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
                 Text(
                     text = photo.author,

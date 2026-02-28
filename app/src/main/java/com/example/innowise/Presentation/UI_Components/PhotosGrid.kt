@@ -38,7 +38,6 @@ fun PhotosGrid(
     ) {
 
         items(photos) { photo ->
-            Log.d("PHOTO_URL", photo.image)
             AsyncImage(
                 model = photo.image,
                 placeholder = painterResource(R.drawable.appicon),

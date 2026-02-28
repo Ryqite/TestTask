@@ -9,5 +9,6 @@ sealed class NavigationScreens {
     @Serializable
     object BookmarksScreen
     @Serializable
-    data class DetailsScreen(val photoId: String)
+    data class DetailsScreen(val photoId: String,
+                             val from: String)
 }

@@ -30,6 +30,8 @@ class DatabaseViewModel @Inject constructor(
     private val _savedPhotosIds = MutableStateFlow<Set<String>>(emptySet())
     val savedPhotosIds: StateFlow<Set<String>> = _savedPhotosIds
 
+    private val _stateLoadingDatabase = MutableStateFlow(false)
+    val stateLoadingDatabase: StateFlow<Boolean> = _stateLoadingDatabase
     init {
         getAllPhotosFromDb()
     }
@@ -51,8 +53,14 @@ class DatabaseViewModel @Inject constructor(
 
     private fun getAllPhotosFromDb() {
         viewModelScope.launch {
-            _photosFromDb.value = getAllPhotosUseCase().map { it.toPhotosItem() }
-            _savedPhotosIds.value = _photosFromDb.value.map { it.title }.toSet()
+            try {
+                _stateLoadingDatabase.value = true
+                _photosFromDb.value = getAllPhotosUseCase().map { it.toPhotosItem() }
+                _savedPhotosIds.value = _photosFromDb.value.map { it.title }.toSet()
+            }
+            finally {
+                _stateLoadingDatabase.value = false
+            }
         }
     }
 }
