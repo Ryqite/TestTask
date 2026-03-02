@@ -78,11 +78,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             InnowiseTheme {
                 val photos by networkViewModel.photosBySearch.collectAsState()
+                val isNetworkError by networkViewModel.isNetworkError.collectAsState()
                 val searchQuery by networkViewModel.searchQuery.collectAsState()
                 val topKeys by networkViewModel.topKeys.collectAsState()
                 val selected by networkViewModel.selected.collectAsState()
                 val savedPhotos by databaseViewModel.photosFromDb.collectAsState()
-                val savedPhotosIds by databaseViewModel.savedPhotosIds.collectAsState()
                 val stateLoading by networkViewModel.stateLoading.collectAsState()
                 val stateLoadingDatabase by databaseViewModel.stateLoadingDatabase.collectAsState()
                 val navController = rememberNavController()
@@ -100,14 +100,17 @@ class MainActivity : ComponentActivity() {
                                 networkViewModel.onSearchQueryChanged(query)
                             },
                             onClear = {networkViewModel.cancelCollector()},
-                            onExplore = {},
+                            onExplore = {
+                                networkViewModel.onSearchQueryChanged("")
+                                networkViewModel.tryAgain()
+                                        },
                             selected = selected,
                             onSelect = {selectedTab->
                                 networkViewModel.onSelectedChanged(selectedTab)
                                 networkViewModel.onSearchQueryChanged(selectedTab)
                             },
                             state = stateLoading,
-                            tryAgain = {},
+                            tryAgain = {networkViewModel.tryAgain()},
                             onClick = {photoId->
                                 navController.navigate(NavigationScreens.DetailsScreen(photoId = photoId, from = "home"))},
                             currentTab = currentTab,
@@ -119,7 +122,8 @@ class MainActivity : ComponentActivity() {
                                     BottomTab.SAVED-> navController.navigate(
                                         NavigationScreens.BookmarksScreen)
                                 }
-                            }
+                            },
+                            isNetworkError = isNetworkError
                             )
                     }
                     composable<NavigationScreens.DetailsScreen> {navBackStackEntry ->

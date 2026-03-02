@@ -13,4 +13,9 @@ class PhotosNetworkRepositoryImpl @Inject constructor(private val remoteDataSour
         return response.photos.map {it.toPhotos()
         }
     }
+    override suspend fun getPopularPhotos(): List<Photos> {
+        val response = remoteDataSource.getPopularPhotos()
+        return response.photos.map {it.toPhotos()
+        }
+    }
 }

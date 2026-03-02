@@ -17,6 +17,7 @@ import com.example.innowise.Presentation.Models.PhotosItem
 import com.example.innowise.Presentation.UI_Components.BottomNavBar
 import com.example.innowise.Presentation.UI_Components.CollectionsRow
 import com.example.innowise.Presentation.UI_Components.EmptyStub
+import com.example.innowise.Presentation.UI_Components.NetworkStub
 import com.example.innowise.Presentation.UI_Components.PhotosGrid
 import com.example.innowise.Presentation.UI_Components.SearchBar
 
@@ -32,6 +33,7 @@ fun HomeScreen(
     selected: String?,
     onSelect: (String) -> Unit,
     onClick: (String)->Unit,
+    isNetworkError: Boolean,
     tryAgain: ()->Unit,
     currentTab: BottomTab,
     onTabSelected: (BottomTab)-> Unit
@@ -72,9 +74,19 @@ fun HomeScreen(
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-
             when {
-                photos.isEmpty() -> EmptyStub(onExplore)
+                (isNetworkError && photos.isEmpty()) -> {
+                    NetworkStub(
+                        tryAgain = tryAgain
+                    )
+                }
+                photos.isEmpty() -> {
+                    EmptyStub(
+                        onExplore = {
+                            onExplore()
+                        }
+                    )
+                }
                 else -> PhotosGrid(photos, modifier = Modifier.weight(1f), onClick = onClick)
             }
         }

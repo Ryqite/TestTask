@@ -18,4 +18,12 @@ interface PhotosAPI {
         @Query("page")
         page: Int = 1
     ): PhotosDTO
+    @GET("v1/curated")
+    @Headers("Authorization: um2qaU7BvikbdWthAywU6LReOPDAY0UJCTRqIYpUK2xu7dBARtdgfa61")
+    suspend fun getPopularPhotos(
+        @Query("per_page")
+        per_page: Int = 30,
+        @Query("page")
+        page: Int = 1
+    ): PhotosDTO
 }

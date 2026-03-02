@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.innowise.Domain.UseCases.GetPhotosBySearchUseCase
+import com.example.innowise.Domain.UseCases.GetPopularPhotosUseCase
 import com.example.innowise.Presentation.Mappers.toPhotosItem
 import com.example.innowise.Presentation.Models.PhotosItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,11 +27,14 @@ import javax.inject.Inject
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class NetworkViewModel @Inject constructor(
-    private val getPhotosBySearchUseCase: GetPhotosBySearchUseCase
+    private val getPhotosBySearchUseCase: GetPhotosBySearchUseCase,
+    private val getPopularPhotosUseCase: GetPopularPhotosUseCase
 ) : ViewModel() {
     private val _photosBySearch = MutableStateFlow<List<PhotosItem>>(emptyList())
     val photosBySearch: StateFlow<List<PhotosItem>> = _photosBySearch
-
+    private val _popularPhotos = MutableStateFlow<List<PhotosItem>>(emptyList())
+    private val _isNetworkError = MutableStateFlow(false)
+    val isNetworkError: StateFlow<Boolean> = _isNetworkError
     private val _searchQuery = MutableStateFlow("Ocean")
     val searchQuery: StateFlow<String> = _searchQuery
 
@@ -111,12 +115,48 @@ class NetworkViewModel @Inject constructor(
 
         }
     }
+    fun tryAgain() {
+        if (searchQuery.value.isBlank()) {
+            loadPopularPhotos()
+            if(_popularPhotos.value.isNotEmpty()) {
+                _photosBySearch.value = _popularPhotos.value
+            }
+        } else {
+            startSearchCollector()
+        }
+    }
+
     private fun loadPhotosBySearch(query: String) {
         viewModelScope.launch {
             try {
                 _stateLoading.value = true
                 _photosBySearch.value = getPhotosBySearchUseCase(query).map { it.toPhotosItem() }
             } catch (e: Exception) {
+                _isNetworkError.value = true
+                when (e) {
+                    is IOException -> Log.e("ErrorHandler", "Ошибка сети: ${e.message}")
+                    is HttpException -> when (e.code()) {
+                        401 -> Log.e("ErrorHandler", "Требуется авторизация")
+                        403 -> Log.e("ErrorHandler", "Доступ запрещен")
+                        404 -> Log.e("ErrorHandler", "Новости не найдены")
+                        in 500..599 -> Log.e("ErrorHandler", "Ошибка сервера")
+                        else -> Log.e("ErrorHandler", "HTTP ошибка: ${e.code()}")
+                    }
+
+                    else -> Log.e("ErrorHandler", "Неизвестная ошибка: ${e.message}")
+                }
+            } finally {
+                _stateLoading.value = false
+            }
+        }
+    }
+    private fun loadPopularPhotos() {
+        viewModelScope.launch {
+            try {
+                _stateLoading.value = true
+                _popularPhotos.value = getPopularPhotosUseCase().map { it.toPhotosItem() }
+            } catch (e: Exception) {
+                _isNetworkError.value = true
                 when (e) {
                     is IOException -> Log.e("ErrorHandler", "Ошибка сети: ${e.message}")
                     is HttpException -> when (e.code()) {

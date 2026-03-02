@@ -28,8 +28,6 @@ class DatabaseViewModel @Inject constructor(
     val photosFromDb: StateFlow<List<PhotosItem>> = _photosFromDb
 
     private val _savedPhotosIds = MutableStateFlow<Set<String>>(emptySet())
-    val savedPhotosIds: StateFlow<Set<String>> = _savedPhotosIds
-
     private val _stateLoadingDatabase = MutableStateFlow(false)
     val stateLoadingDatabase: StateFlow<Boolean> = _stateLoadingDatabase
     init {
